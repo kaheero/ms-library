@@ -4,6 +4,8 @@ import com.github.kaheero.exceptions.BussinessException;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,12 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public Page<BookEntity> find(BookEntity bookEntity, Pageable pageable) {
-    return null;
+    Example<BookEntity> example = Example.of(bookEntity, ExampleMatcher
+            .matching()
+            .withIgnoreCase()
+            .withIgnoreNullValues()
+            .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+    return repository.findAll(example, pageable);
   }
 
 }

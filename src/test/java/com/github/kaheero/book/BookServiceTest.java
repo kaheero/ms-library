@@ -3,6 +3,9 @@ package com.github.kaheero.book;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.kaheero.exceptions.BussinessException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -214,6 +221,34 @@ class BookServiceTest {
     Mockito
         .verify(this.repository, Mockito.never())
         .save(book);
+  }
+
+  @Test
+  @DisplayName("Deve filtrar os livros pelas propriedades")
+  public void findBookTest() {
+    // cenario
+    final int NUMBER_PAGE = 0;
+    final int TOTAL_ELEMENTS_FOR_PAGE = 10;
+    BookEntity book = this.createValidBook();
+    List<BookEntity> books = new ArrayList<>();
+    books.add(book);
+    PageRequest pageRequest = PageRequest.of(NUMBER_PAGE, TOTAL_ELEMENTS_FOR_PAGE);
+    Page<BookEntity> page = new PageImpl<>(books, pageRequest, 1);
+
+    BDDMockito
+            .when(repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
+            .thenReturn(page);
+
+    // execucao
+    Page<BookEntity> pageOfBooks = service.find(book, pageRequest);
+
+    // verificacao
+    assertThat(pageOfBooks.getTotalElements()).isEqualTo(1);
+    assertThat(pageOfBooks.getContent()).isNotEmpty();
+    assertThat(pageOfBooks.getContent()).hasSize(1);
+    assertThat(pageOfBooks.getContent()).isEqualTo(books);
+    assertThat(pageOfBooks.getPageable().getPageNumber()).isZero();
+    assertThat(pageOfBooks.getPageable().getPageSize()).isEqualTo(TOTAL_ELEMENTS_FOR_PAGE);
   }
 
   private BookEntity createValidBook() {

@@ -5,6 +5,9 @@ import com.github.kaheero.exceptions.BussinessException;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +23,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/books")
@@ -27,6 +33,17 @@ public class BookController {
 
   private final BookService service;
   private final ModelMapper mapper;
+
+  @GetMapping
+  public Page<BookDTO> findBooks(BookDTO bookDTO, Pageable pageRequest){
+    BookEntity bookEntity = mapper.map(bookDTO, BookEntity.class);
+    Page<BookEntity> result = service.find(bookEntity, pageRequest);
+    List<BookDTO> books = result.getContent()
+            .stream()
+            .map(entity -> mapper.map(entity, BookDTO.class))
+            .collect(Collectors.toList());
+    return new PageImpl<>(books, pageRequest, result.getTotalElements());
+  }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)

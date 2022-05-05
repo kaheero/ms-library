@@ -1,6 +1,7 @@
 package com.github.kaheero.exceptions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.validation.BindingResult;
@@ -21,7 +22,7 @@ public class ApiErrors {
   }
 
   public ApiErrors(BussinessException exception) {
-    this.erros = List.of(exception.getMessage());
+    this.erros = Collections.singletonList(exception.getMessage());
   }
 
 }

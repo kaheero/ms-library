@@ -5,8 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kaheero.exceptions.BussinessException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -295,15 +294,13 @@ class BookControllerTest {
         .isbn(buildBookDTO().getIsbn())
         .build();
 
-    Page<BookEntity> page = new PageImpl<>(List.of(book), PageRequest.of(0, 100), 1);
+    Page<BookEntity> page = new PageImpl<>(Collections.singletonList(book), PageRequest.of(0, 100), 1);
 
     BDDMockito
         .given(bookService.find(Mockito.any(BookEntity.class), Mockito.any(Pageable.class)))
         .willReturn(page);
 
-    final String queryString = String.format("?title=%s&author=%s&page=0&size=100",
-        book.getTitle(),
-        book.getAuthor());
+    final String queryString = String.format("?title=%s&author=%s&page=0&size=100", book.getTitle(), book.getAuthor());
 
     // execução
     MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -313,7 +310,7 @@ class BookControllerTest {
 
     // verificação
     mvc.perform(requestBuilder)
-        .andExpect(status().isPartialContent())
+        .andExpect(status().isOk())
         .andExpect(jsonPath("content", Matchers.hasSize(1)))
         .andExpect(jsonPath("totalElements").value(1))
         .andExpect(jsonPath("pageable.pageSize").value(100))
