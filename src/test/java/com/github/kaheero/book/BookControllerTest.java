@@ -286,6 +286,8 @@ class BookControllerTest {
   void findBookTest() throws Exception {
     // cenário
     final Long bookId = 1L;
+    final int numberOfPage = 0;
+    final int totalOfElementsPerPage = 100;
 
     BookEntity book = BookEntity.builder()
         .id(bookId)
@@ -294,13 +296,20 @@ class BookControllerTest {
         .isbn(buildBookDTO().getIsbn())
         .build();
 
-    Page<BookEntity> page = new PageImpl<>(Collections.singletonList(book), PageRequest.of(0, 100), 1);
+    Page<BookEntity> page = new PageImpl<>(
+        Collections.singletonList(book),
+        PageRequest.of(numberOfPage, totalOfElementsPerPage), 1);
 
     BDDMockito
         .given(bookService.find(Mockito.any(BookEntity.class), Mockito.any(Pageable.class)))
         .willReturn(page);
 
-    final String queryString = String.format("?title=%s&author=%s&page=0&size=100", book.getTitle(), book.getAuthor());
+    final String queryString = String.format("?title=%s&author=%s&page=%d&size=%d",
+        book.getTitle(),
+        book.getAuthor(),
+        numberOfPage,
+        totalOfElementsPerPage
+    );
 
     // execução
     MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -310,11 +319,11 @@ class BookControllerTest {
 
     // verificação
     mvc.perform(requestBuilder)
-        .andExpect(status().isOk())
+        .andExpect(status().isPartialContent())
         .andExpect(jsonPath("content", Matchers.hasSize(1)))
         .andExpect(jsonPath("totalElements").value(1))
-        .andExpect(jsonPath("pageable.pageSize").value(100))
-        .andExpect(jsonPath("pageable.pageNumber").value(0));
+        .andExpect(jsonPath("pageable.pageNumber").value(numberOfPage))
+        .andExpect(jsonPath("pageable.pageSize").value(totalOfElementsPerPage));
   }
 
   private BookDTO buildBookDTO() {

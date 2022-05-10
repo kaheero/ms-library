@@ -17,45 +17,107 @@ import java.io.IOException;
 
 @JsonTest
 @ExtendWith(SpringExtension.class)
-public class BookDTOJsonTest {
+class BookDTOJsonTest {
 
-    @Autowired
-    private JacksonTester<BookDTO> json;
-    private BookDTO bookDTO;
+  @Autowired
+  private JacksonTester<BookDTO> json;
+  private BookDTO bookDTO;
 
-    @BeforeEach
-    public void setup(){
-        this.bookDTO = this.createNewValidBookDTO();
-    }
+  private static final Long ID = 1L;
+  private static final String TITLE = "Vinte mil leguas submarinas";
+  private static final String AUTHOR = "Julio Verne";
+  private static final String ISBN = "1234567890";
 
-    @Test
-    @DisplayName("Serializes ID")
-    public void idSerializes() throws IOException {
-        JsonContent<BookDTO> jsonContent = this.json.write(bookDTO);
+  @BeforeEach
+  public void setup(){
+    this.bookDTO = this.createNewValidBookDTO();
+  }
 
-        Assertions.assertThat(jsonContent)
-                .extractingJsonPathValue("$.id")
-                .isEqualTo(1);
-    }
+  @Test
+  @DisplayName("Serializes id.")
+  void idSerializes() throws IOException {
+    JsonContent<BookDTO> jsonContent = this.json.write(bookDTO);
 
-    @Test
-    @DisplayName("Deserialize ID")
-    public void idDeserializes() throws IOException {
-        Long id = this.json.parseObject(this.parseDtoToJson()).getId();
-        Assertions.assertThat(id).isEqualTo(bookDTO.getId());
-    }
+    Assertions.assertThat(jsonContent)
+        .extractingJsonPathValue("$.id")
+        .isEqualTo(1);
+  }
 
-    private BookDTO createNewValidBookDTO(){
-        return BookDTO.builder()
-                .id(1L)
-                .title("Vinte mil leguas submarinas")
-                .author("Julio Verne")
-                .isbn("1234567890")
-                .build();
-    }
+  @Test
+  @DisplayName("Deserialize id.")
+  void idDeserializes() throws IOException {
+    final Long bookId = 1L;
 
-    private String parseDtoToJson() throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(this.createNewValidBookDTO());
-    }
+    Long id = this.json.parseObject(this.parseDtoToJson()).getId();
+
+    Assertions.assertThat(bookId).isEqualTo(id);
+  }
+
+  @Test
+  @DisplayName("Serializes title.")
+  void titleSerializes() throws IOException {
+    JsonContent<BookDTO> jsonContent = this.json.write(bookDTO);
+
+    Assertions.assertThat(jsonContent)
+        .extractingJsonPathValue("$.title")
+        .isEqualTo(TITLE);
+  }
+
+  @Test
+  @DisplayName("Deserialize title.")
+  void titleDeserialize() throws IOException {
+    String title = this.json.parseObject(this.parseDtoToJson()).getTitle();
+
+    Assertions.assertThat(title).isEqualTo(TITLE);
+  }
+
+  @Test
+  @DisplayName("Serializes author.")
+  void authorSerializes() throws IOException {
+    JsonContent<BookDTO> jsonContent = this.json.write(bookDTO);
+
+    Assertions.assertThat(jsonContent)
+        .extractingJsonPathValue("$.author")
+        .isEqualTo(AUTHOR);
+  }
+
+  @Test
+  @DisplayName("Deserialize author.")
+  void authorDeserialize() throws IOException {
+    String author = this.json.parseObject(this.parseDtoToJson()).getAuthor();
+
+    Assertions.assertThat(author).isEqualTo(AUTHOR);
+  }
+
+  @Test
+  @DisplayName("Serializes isbn.")
+  void isbnSerializes() throws IOException {
+    JsonContent<BookDTO> jsonContent = this.json.write(bookDTO);
+
+    Assertions.assertThat(jsonContent)
+        .extractingJsonPathValue("$.isbn")
+        .isEqualTo(ISBN);
+  }
+
+  @Test
+  @DisplayName("Deserialize isbn.")
+  void isbnDeserialize() throws IOException {
+    String isbn = this.json.parseObject(this.parseDtoToJson()).getIsbn();
+
+    Assertions.assertThat(isbn).isEqualTo(ISBN);
+  }
+
+  private BookDTO createNewValidBookDTO(){
+    return BookDTO.builder()
+        .id(ID)
+        .title(TITLE)
+        .author(AUTHOR)
+        .isbn(ISBN)
+        .build();
+  }
+
+  private String parseDtoToJson() throws JsonProcessingException {
+    return new ObjectMapper().writeValueAsString(this.createNewValidBookDTO());
+  }
 
 }

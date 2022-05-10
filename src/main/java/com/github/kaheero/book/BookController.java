@@ -35,6 +35,7 @@ public class BookController {
   private final ModelMapper mapper;
 
   @GetMapping
+  @ResponseStatus(HttpStatus.PARTIAL_CONTENT)
   public Page<BookDTO> findBooks(BookDTO bookDTO, Pageable pageRequest){
     BookEntity bookEntity = mapper.map(bookDTO, BookEntity.class);
     Page<BookEntity> result = service.find(bookEntity, pageRequest);
