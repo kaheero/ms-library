@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDTO {
+
   private Long id;
 
   @NotEmpty
@@ -21,4 +22,5 @@ public class BookDTO {
 
   @NotEmpty
   private String isbn;
+
 }

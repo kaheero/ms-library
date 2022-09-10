@@ -2,7 +2,7 @@ package com.github.kaheero.book;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.kaheero.exceptions.BussinessException;
+import com.github.kaheero.exceptions.BusinessException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,7 @@ class BookServiceTest {
 
     // verificação
     assertThat(throwable)
-        .isInstanceOf(BussinessException.class)
+        .isInstanceOf(BusinessException.class)
         .hasMessage("isbn já cadastrado");
     Mockito.verify(repository, Mockito.never()).save(book);
   }

@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.kaheero.exceptions.BussinessException;
+import com.github.kaheero.exceptions.BusinessException;
 import java.util.Collections;
 import java.util.Optional;
 import org.hamcrest.Matchers;
@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc
 @ComponentScan(basePackages = "com.github.kaheero")
 class BookControllerTest {
@@ -114,7 +114,7 @@ class BookControllerTest {
 
     BDDMockito
         .when(bookService.save(Mockito.any(BookEntity.class)))
-        .thenThrow(new BussinessException(errorMessage));
+        .thenThrow(new BusinessException(errorMessage));
 
     MockHttpServletRequestBuilder request = MockMvcRequestBuilders
         .post(API_PATH_BOOKS)

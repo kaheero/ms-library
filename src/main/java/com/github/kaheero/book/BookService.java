@@ -15,4 +15,7 @@ public interface BookService {
   BookEntity update(BookEntity bookEntity);
 
   Page<BookEntity> find(BookEntity bookEntity, Pageable pageable);
+
+  Optional<BookEntity> getBookByIsbn(String isbn);
+
 }

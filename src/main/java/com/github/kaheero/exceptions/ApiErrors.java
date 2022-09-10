@@ -14,14 +14,14 @@ public class ApiErrors {
 
   public ApiErrors(BindingResult bindingResult) {
     this.erros = new ArrayList<>();
-    bindingResult.getAllErrors().forEach(erro -> {
-      String fieldName = ((FieldError) erro).getField();
-      String errorMessage = erro.getDefaultMessage();
+    bindingResult.getAllErrors().forEach(error -> {
+      String fieldName = ((FieldError) error).getField();
+      String errorMessage = error.getDefaultMessage();
       this.erros.add(fieldName + " " + errorMessage);
     });
   }
 
-  public ApiErrors(BussinessException exception) {
+  public ApiErrors(BusinessException exception) {
     this.erros = Collections.singletonList(exception.getMessage());
   }
 

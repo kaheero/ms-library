@@ -32,4 +32,5 @@ public class BookEntity {
 
   @Column
   private String isbn;
+
 }

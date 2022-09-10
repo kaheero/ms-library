@@ -1,7 +1,7 @@
 package com.github.kaheero.book;
 
 import com.github.kaheero.exceptions.ApiErrors;
-import com.github.kaheero.exceptions.BussinessException;
+import com.github.kaheero.exceptions.BusinessException;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -85,12 +85,10 @@ public class BookController {
     return new ApiErrors(bindingResult);
   }
 
-  @ExceptionHandler(BussinessException.class)
+  @ExceptionHandler(BusinessException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ApiErrors handleValidationExceptions(BussinessException exception) {
+  public ApiErrors handleValidationExceptions(BusinessException exception) {
     return new ApiErrors(exception);
   }
 
 }
-
-
