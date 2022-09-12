@@ -1,6 +1,7 @@
 package com.github.kaheero.loans;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,7 @@ import com.github.kaheero.book.BookEntity;
 import com.github.kaheero.book.BookService;
 import java.time.LocalDate;
 import java.util.Optional;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,6 +86,31 @@ public class LoanControllerTest {
     mvc.perform(requestBuilder)
         .andExpect(status().isCreated())
         .andExpect(content().string("1"));
+  }
+
+  @Test
+  @DisplayName("Deve retornar erro ao tentar fazer emprestimo de um livro inexistente")
+  public void invalidIsbnCreateLoanTest() throws Exception {
+
+    LoanDTO loanDTO = LoanDTO.builder()
+        .isbn("123")
+        .customer("John Doe")
+        .build();
+
+    BDDMockito
+        .given(bookService.getBookByIsbn("123"))
+        .willReturn(Optional.empty());
+
+    String payload = new ObjectMapper().writeValueAsString(loanDTO);
+
+    MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(API_PATH_LOANS)
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(payload);
+
+    mvc.perform(requestBuilder)
+        .andExpect(jsonPath("errors", Matchers.hasSize(1)))
+        .andExpect(jsonPath("errors[0]").value("Book not found passed isbn"));
   }
 
 }

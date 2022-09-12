@@ -102,7 +102,7 @@ class BookControllerTest {
     // verificação
     mvc.perform(request)
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("erros", Matchers.hasSize(3)));
+        .andExpect(jsonPath("errors", Matchers.hasSize(3)));
   }
 
   @Test
@@ -124,8 +124,8 @@ class BookControllerTest {
 
     mvc.perform(request)
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("erros", Matchers.hasSize(1)))
-        .andExpect(jsonPath("erros[0]").value(errorMessage));
+        .andExpect(jsonPath("errors", Matchers.hasSize(1)))
+        .andExpect(jsonPath("errors[0]").value(errorMessage));
   }
 
   @Test
