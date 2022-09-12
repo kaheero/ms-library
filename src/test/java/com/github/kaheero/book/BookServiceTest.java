@@ -251,6 +251,29 @@ class BookServiceTest {
     assertThat(pageOfBooks.getPageable().getPageSize()).isEqualTo(TOTAL_ELEMENTS_FOR_PAGE);
   }
 
+  @Test
+  @DisplayName("Deve obter um livro pelo isbn")
+  public void getBookByIsbnTest() {
+    final String isbn = "1230";
+
+    BookEntity bookEntity = BookEntity.builder()
+        .id(1L)
+        .isbn("1230")
+        .build();
+
+    BDDMockito
+        .when(repository.findByIsbn(isbn))
+        .thenReturn(Optional.of(bookEntity));
+
+    Optional<BookEntity> optionalBookEntity = service.getBookByIsbn("1230");
+
+    Assertions.assertThat(optionalBookEntity).isPresent();
+    Assertions.assertThat(optionalBookEntity.get().getId()).isEqualTo(1L);
+    Assertions.assertThat(optionalBookEntity.get().getIsbn()).isEqualTo("1230");
+
+    Mockito.verify(repository, Mockito.times(1)).findByIsbn(isbn);
+  }
+
   private BookEntity createValidBook() {
     return BookEntity.builder()
         .title("Vinte mil léguas submarinas.")
