@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kaheero.book.BookEntity;
 import com.github.kaheero.book.BookService;
+import com.github.kaheero.exceptions.BusinessException;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.hamcrest.Matchers;
@@ -80,7 +81,7 @@ public class LoanControllerTest {
 
     MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
         .post(API_PATH_LOANS)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
         .content(payload);
 
     mvc.perform(requestBuilder)
@@ -111,6 +112,39 @@ public class LoanControllerTest {
     mvc.perform(requestBuilder)
         .andExpect(jsonPath("errors", Matchers.hasSize(1)))
         .andExpect(jsonPath("errors[0]").value("Book not found passed isbn"));
+  }
+
+  @Test
+  @DisplayName("Deve retornar erro ao tentar fazer empréstimo de um livro emprestado.")
+  public void loanedBookErrorOnCreateLoanTest() throws Exception {
+
+    BookEntity bookEntity = BookEntity.builder()
+        .isbn("123")
+        .build();
+
+    BDDMockito
+        .given(bookService.getBookByIsbn("123"))
+        .willReturn(Optional.of(bookEntity));
+
+    BDDMockito
+        .given(loanService.save(Mockito.any(LoanEntity.class)))
+        .willThrow(new BusinessException("Book already loaned"));
+
+    LoanDTO loanDTO = LoanDTO.builder()
+        .isbn("123")
+        .customer("John Doe")
+        .build();
+
+    String payload = new ObjectMapper().writeValueAsString(loanDTO);
+
+    MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(API_PATH_LOANS)
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(payload);
+
+    mvc.perform(requestBuilder)
+        .andExpect(jsonPath("errors", Matchers.hasSize(1)))
+        .andExpect(jsonPath("errors[0]").value("Book already loaned"));
   }
 
 }
